@@ -1,0 +1,3 @@
+[submodule "CrawlService"]
+	path = CrawlService
+	url = https://github.com/ConanYu/CrawlService
