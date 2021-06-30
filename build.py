@@ -7,6 +7,11 @@ def main() -> None:
     cwd = os.getcwd()
     root = os.path.dirname(os.path.abspath(__file__))
     os.chdir(root)
+    try:
+        os.rmdir(os.path.join(root, 'CrawlService'))
+        os.system('git clone https://github.com/ConanYu/CrawlService')
+    except OSError:
+        pass
     os.system('protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative -I. CrawlService/crawl_service/crawl_service.proto')
     if not os.path.exists(os.path.join(root, 'src', 'pb')):
         os.mkdir(os.path.join(root, 'src', 'pb'))
