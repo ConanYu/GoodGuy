@@ -15,6 +15,10 @@ func checkToken(token string, err error, body *[]byte) int {
 }
 
 func requestHandleSchema1(body *[]byte) int {
+	class, _ := jsonparser.GetString(*body, "type")
+	if class == "url_verification" {
+		return http.StatusAccepted
+	}
 	token, err := jsonparser.GetString(*body, "token")
 	return checkToken(token, err, body)
 }
@@ -24,13 +28,13 @@ func requestHandleSchema2(body *[]byte) int {
 	return checkToken(token, err, body)
 }
 
-func RequestHandle(body []byte) int {
-	schema, err := jsonparser.GetString(body, "schema")
+func RequestHandle(body *[]byte) int {
+	schema, err := jsonparser.GetString(*body, "schema")
 	if err != nil {
-		return requestHandleSchema1(&body)
+		return requestHandleSchema1(body)
 	}
 	if schema == "2.0" {
-		return requestHandleSchema2(&body)
+		return requestHandleSchema2(body)
 	} else {
 		return http.StatusBadRequest
 	}

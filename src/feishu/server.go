@@ -2,6 +2,7 @@ package feishu
 
 import (
 	"fmt"
+	"github.com/buger/jsonparser"
 	"log"
 	"net/http"
 )
@@ -13,11 +14,23 @@ func getBodyFromRequest(req *http.Request) []byte {
 	return body
 }
 
+func urlVerification(rw *http.ResponseWriter, body *[]byte) {
+	challenge, _ := jsonparser.GetString(*body, "challenge")
+	response := fmt.Sprintf("{\"challenge\": \"%s\"}", challenge)
+	_, _ = (*rw).Write([]byte(response))
+}
+
 func httpHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
-		rw.WriteHeader(RequestHandle(getBodyFromRequest(req)))
+		body := getBodyFromRequest(req)
+		code := RequestHandle(&body)
+		if code == http.StatusAccepted {
+			urlVerification(&rw, &body)
+			code = http.StatusOK
+		}
+		rw.WriteHeader(code)
 	} else {
-		rw.WriteHeader(http.StatusBadRequest)
+		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
